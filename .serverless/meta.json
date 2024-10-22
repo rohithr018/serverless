@@ -1,0 +1,529 @@
+{
+  "/home/rohith/Desktop/code/serverless-tut": {
+    "versionSfCore": null,
+    "versionFramework": "4.4.7",
+    "isWithinCompose": false,
+    "isCompose": false,
+    "composeOrgName": null,
+    "composeResolverProviders": {
+      "default-aws-credential-resolver": "<REDACTED>"
+    },
+    "composeServiceName": null,
+    "servicePath": "/home/rohith/Desktop/code/serverless-tut",
+    "serviceConfigFileName": "serverless.yml",
+    "service": {
+      "service": "service-api",
+      "provider": {
+        "name": "aws",
+        "runtime": "nodejs18.x",
+        "region": "ap-south-1",
+        "stage": "dev",
+        "versionFunctions": true,
+        "compiledCloudFormationTemplate": {
+          "AWSTemplateFormatVersion": "2010-09-09",
+          "Description": "The AWS CloudFormation template for this Serverless application",
+          "Resources": {
+            "HiFunctionLogGroup": {
+              "Type": "AWS::Logs::LogGroup",
+              "Properties": {
+                "LogGroupName": "/aws/lambda/service-api-dev-hiFunction"
+              }
+            },
+            "ByeFunctionLogGroup": {
+              "Type": "AWS::Logs::LogGroup",
+              "Properties": {
+                "LogGroupName": "/aws/lambda/service-api-dev-byeFunction"
+              }
+            },
+            "IamRoleLambdaExecution": {
+              "Type": "AWS::IAM::Role",
+              "Properties": {
+                "AssumeRolePolicyDocument": {
+                  "Version": "2012-10-17",
+                  "Statement": [
+                    {
+                      "Effect": "Allow",
+                      "Principal": {
+                        "Service": [
+                          "lambda.amazonaws.com"
+                        ]
+                      },
+                      "Action": [
+                        "sts:AssumeRole"
+                      ]
+                    }
+                  ]
+                },
+                "Policies": [
+                  {
+                    "PolicyName": {
+                      "Fn::Join": [
+                        "-",
+                        [
+                          "service-api",
+                          "dev",
+                          "lambda"
+                        ]
+                      ]
+                    },
+                    "PolicyDocument": {
+                      "Version": "2012-10-17",
+                      "Statement": [
+                        {
+                          "Effect": "Allow",
+                          "Action": [
+                            "logs:CreateLogStream",
+                            "logs:CreateLogGroup",
+                            "logs:TagResource"
+                          ],
+                          "Resource": [
+                            {
+                              "Fn::Sub": "arn:${AWS::Partition}:logs:${AWS::Region}:${AWS::AccountId}:log-group:/aws/lambda/service-api-dev*:*"
+                            }
+                          ]
+                        },
+                        {
+                          "Effect": "Allow",
+                          "Action": [
+                            "logs:PutLogEvents"
+                          ],
+                          "Resource": [
+                            {
+                              "Fn::Sub": "arn:${AWS::Partition}:logs:${AWS::Region}:${AWS::AccountId}:log-group:/aws/lambda/service-api-dev*:*:*"
+                            }
+                          ]
+                        }
+                      ]
+                    }
+                  }
+                ],
+                "Path": "/",
+                "RoleName": {
+                  "Fn::Join": [
+                    "-",
+                    [
+                      "service-api",
+                      "dev",
+                      {
+                        "Ref": "AWS::Region"
+                      },
+                      "lambdaRole"
+                    ]
+                  ]
+                }
+              }
+            },
+            "HiFunctionLambdaFunction": {
+              "Type": "AWS::Lambda::Function",
+              "Properties": {
+                "Code": {
+                  "S3Bucket": "serverless-framework-deployments-ap-south-1-574a5a19-d119",
+                  "S3Key": "serverless/service-api/dev/1729612523501-2024-10-22T15:55:23.501Z/service-api.zip"
+                },
+                "Handler": "hello.handler",
+                "Runtime": "nodejs18.x",
+                "FunctionName": "service-api-dev-hiFunction",
+                "MemorySize": 1024,
+                "Timeout": 6,
+                "Role": {
+                  "Fn::GetAtt": [
+                    "IamRoleLambdaExecution",
+                    "Arn"
+                  ]
+                }
+              },
+              "DependsOn": [
+                "HiFunctionLogGroup"
+              ]
+            },
+            "ByeFunctionLambdaFunction": {
+              "Type": "AWS::Lambda::Function",
+              "Properties": {
+                "Code": {
+                  "S3Bucket": "serverless-framework-deployments-ap-south-1-574a5a19-d119",
+                  "S3Key": "serverless/service-api/dev/1729612523501-2024-10-22T15:55:23.501Z/service-api.zip"
+                },
+                "Handler": "gm.handler",
+                "Runtime": "nodejs18.x",
+                "FunctionName": "service-api-dev-byeFunction",
+                "MemorySize": 1024,
+                "Timeout": 6,
+                "Role": {
+                  "Fn::GetAtt": [
+                    "IamRoleLambdaExecution",
+                    "Arn"
+                  ]
+                }
+              },
+              "DependsOn": [
+                "ByeFunctionLogGroup"
+              ]
+            },
+            "HiFunctionLambdaVersion4MkJPu2pTRLKBUO64B2rZ2v7e1q8Xb0VP2kpDVurL0": {
+              "Type": "AWS::Lambda::Version",
+              "DeletionPolicy": "Retain",
+              "Properties": {
+                "FunctionName": {
+                  "Ref": "HiFunctionLambdaFunction"
+                },
+                "CodeSha256": "KFnC/Az9pmLRFLob5582oAQ50VJhu++ZS6zijBLGONo="
+              }
+            },
+            "ByeFunctionLambdaVersiongy4LjNZql5lTjYxQOATQa3JxigAhUqEAGftCsxVxg": {
+              "Type": "AWS::Lambda::Version",
+              "DeletionPolicy": "Retain",
+              "Properties": {
+                "FunctionName": {
+                  "Ref": "ByeFunctionLambdaFunction"
+                },
+                "CodeSha256": "KFnC/Az9pmLRFLob5582oAQ50VJhu++ZS6zijBLGONo="
+              }
+            },
+            "HttpApi": {
+              "Type": "AWS::ApiGatewayV2::Api",
+              "Properties": {
+                "Name": "dev-service-api",
+                "ProtocolType": "HTTP"
+              }
+            },
+            "HttpApiStage": {
+              "Type": "AWS::ApiGatewayV2::Stage",
+              "Properties": {
+                "ApiId": {
+                  "Ref": "HttpApi"
+                },
+                "StageName": "$default",
+                "AutoDeploy": true,
+                "DefaultRouteSettings": {
+                  "DetailedMetricsEnabled": false
+                }
+              }
+            },
+            "HiFunctionLambdaPermissionHttpApi": {
+              "Type": "AWS::Lambda::Permission",
+              "Properties": {
+                "FunctionName": {
+                  "Fn::GetAtt": [
+                    "HiFunctionLambdaFunction",
+                    "Arn"
+                  ]
+                },
+                "Action": "lambda:InvokeFunction",
+                "Principal": "apigateway.amazonaws.com",
+                "SourceArn": {
+                  "Fn::Join": [
+                    "",
+                    [
+                      "arn:",
+                      {
+                        "Ref": "AWS::Partition"
+                      },
+                      ":execute-api:",
+                      {
+                        "Ref": "AWS::Region"
+                      },
+                      ":",
+                      {
+                        "Ref": "AWS::AccountId"
+                      },
+                      ":",
+                      {
+                        "Ref": "HttpApi"
+                      },
+                      "/*"
+                    ]
+                  ]
+                }
+              }
+            },
+            "HttpApiIntegrationHiFunction": {
+              "Type": "AWS::ApiGatewayV2::Integration",
+              "Properties": {
+                "ApiId": {
+                  "Ref": "HttpApi"
+                },
+                "IntegrationType": "AWS_PROXY",
+                "IntegrationUri": {
+                  "Fn::GetAtt": [
+                    "HiFunctionLambdaFunction",
+                    "Arn"
+                  ]
+                },
+                "PayloadFormatVersion": "2.0",
+                "TimeoutInMillis": 30000
+              }
+            },
+            "HttpApiRouteGetHello": {
+              "Type": "AWS::ApiGatewayV2::Route",
+              "Properties": {
+                "ApiId": {
+                  "Ref": "HttpApi"
+                },
+                "RouteKey": "GET /hello",
+                "Target": {
+                  "Fn::Join": [
+                    "/",
+                    [
+                      "integrations",
+                      {
+                        "Ref": "HttpApiIntegrationHiFunction"
+                      }
+                    ]
+                  ]
+                }
+              },
+              "DependsOn": "HttpApiIntegrationHiFunction"
+            },
+            "ByeFunctionLambdaPermissionHttpApi": {
+              "Type": "AWS::Lambda::Permission",
+              "Properties": {
+                "FunctionName": {
+                  "Fn::GetAtt": [
+                    "ByeFunctionLambdaFunction",
+                    "Arn"
+                  ]
+                },
+                "Action": "lambda:InvokeFunction",
+                "Principal": "apigateway.amazonaws.com",
+                "SourceArn": {
+                  "Fn::Join": [
+                    "",
+                    [
+                      "arn:",
+                      {
+                        "Ref": "AWS::Partition"
+                      },
+                      ":execute-api:",
+                      {
+                        "Ref": "AWS::Region"
+                      },
+                      ":",
+                      {
+                        "Ref": "AWS::AccountId"
+                      },
+                      ":",
+                      {
+                        "Ref": "HttpApi"
+                      },
+                      "/*"
+                    ]
+                  ]
+                }
+              }
+            },
+            "HttpApiIntegrationByeFunction": {
+              "Type": "AWS::ApiGatewayV2::Integration",
+              "Properties": {
+                "ApiId": {
+                  "Ref": "HttpApi"
+                },
+                "IntegrationType": "AWS_PROXY",
+                "IntegrationUri": {
+                  "Fn::GetAtt": [
+                    "ByeFunctionLambdaFunction",
+                    "Arn"
+                  ]
+                },
+                "PayloadFormatVersion": "2.0",
+                "TimeoutInMillis": 30000
+              }
+            },
+            "HttpApiRouteGetGm": {
+              "Type": "AWS::ApiGatewayV2::Route",
+              "Properties": {
+                "ApiId": {
+                  "Ref": "HttpApi"
+                },
+                "RouteKey": "GET /gm",
+                "Target": {
+                  "Fn::Join": [
+                    "/",
+                    [
+                      "integrations",
+                      {
+                        "Ref": "HttpApiIntegrationByeFunction"
+                      }
+                    ]
+                  ]
+                }
+              },
+              "DependsOn": "HttpApiIntegrationByeFunction"
+            }
+          },
+          "Outputs": {
+            "ServerlessDeploymentBucketName": {
+              "Value": "serverless-framework-deployments-ap-south-1-574a5a19-d119",
+              "Export": {
+                "Name": "sls-service-api-dev-ServerlessDeploymentBucketName"
+              }
+            },
+            "HiFunctionLambdaFunctionQualifiedArn": {
+              "Description": "Current Lambda function version",
+              "Value": {
+                "Ref": "HiFunctionLambdaVersion4MkJPu2pTRLKBUO64B2rZ2v7e1q8Xb0VP2kpDVurL0"
+              },
+              "Export": {
+                "Name": "sls-service-api-dev-HiFunctionLambdaFunctionQualifiedArn"
+              }
+            },
+            "ByeFunctionLambdaFunctionQualifiedArn": {
+              "Description": "Current Lambda function version",
+              "Value": {
+                "Ref": "ByeFunctionLambdaVersiongy4LjNZql5lTjYxQOATQa3JxigAhUqEAGftCsxVxg"
+              },
+              "Export": {
+                "Name": "sls-service-api-dev-ByeFunctionLambdaFunctionQualifiedArn"
+              }
+            },
+            "HttpApiId": {
+              "Description": "Id of the HTTP API",
+              "Value": {
+                "Ref": "HttpApi"
+              },
+              "Export": {
+                "Name": "sls-service-api-dev-HttpApiId"
+              }
+            },
+            "HttpApiUrl": {
+              "Description": "URL of the HTTP API",
+              "Value": {
+                "Fn::Join": [
+                  "",
+                  [
+                    "https://",
+                    {
+                      "Ref": "HttpApi"
+                    },
+                    ".execute-api.",
+                    {
+                      "Ref": "AWS::Region"
+                    },
+                    ".",
+                    {
+                      "Ref": "AWS::URLSuffix"
+                    }
+                  ]
+                ]
+              },
+              "Export": {
+                "Name": "sls-service-api-dev-HttpApiUrl"
+              }
+            }
+          }
+        },
+        "vpc": {}
+      },
+      "functions": {
+        "hiFunction": {
+          "handler": "hello.handler",
+          "events": [
+            {
+              "httpApi": {
+                "path": "/hello",
+                "method": "GET"
+              },
+              "resolvedMethod": "GET",
+              "resolvedPath": "/hello"
+            }
+          ],
+          "name": "service-api-dev-hiFunction",
+          "package": {},
+          "memory": 1024,
+          "timeout": 6,
+          "runtime": "nodejs18.x",
+          "vpc": {},
+          "versionLogicalId": "HiFunctionLambdaVersion4MkJPu2pTRLKBUO64B2rZ2v7e1q8Xb0VP2kpDVurL0"
+        },
+        "byeFunction": {
+          "handler": "gm.handler",
+          "events": [
+            {
+              "httpApi": {
+                "path": "/gm",
+                "method": "GET"
+              },
+              "resolvedMethod": "GET",
+              "resolvedPath": "/gm"
+            }
+          ],
+          "name": "service-api-dev-byeFunction",
+          "package": {},
+          "memory": 1024,
+          "timeout": 6,
+          "runtime": "nodejs18.x",
+          "vpc": {},
+          "versionLogicalId": "ByeFunctionLambdaVersiongy4LjNZql5lTjYxQOATQa3JxigAhUqEAGftCsxVxg"
+        }
+      }
+    },
+    "serviceRawFile": "service: service-api\n\nprovider:\n  name: aws\n  runtime: nodejs18.x\n  region: ap-south-1\n\nfunctions:\n  hiFunction:\n    handler: hello.handler\n    events:\n      - httpApi: \n          path: /hello\n          method: GET\n  byeFunction:\n    handler: gm.handler\n    events:\n      - httpApi: \n          path: /gm\n          method: GET\n\n\n\n\n          \n          ",
+    "command": [
+      "deploy"
+    ],
+    "options": {},
+    "error": null,
+    "params": {},
+    "machineId": "adc1ee34afdf4692ea68e1f411d9362e",
+    "stage": "dev",
+    "accessKeyV2": "<REDACTED>",
+    "accessKeyV1": "<REDACTED>",
+    "orgId": "fb236975-c6a0-431b-acbd-92ffac7a07be",
+    "orgName": "rohithr",
+    "userId": "CK4wbwCgNgc95jKQN3",
+    "dashboard": {
+      "isEnabledForService": false,
+      "requiredAuthentication": false,
+      "orgFeaturesInUse": null,
+      "orgObservabilityIntegrations": null,
+      "serviceAppId": null,
+      "serviceProvider": null,
+      "instanceParameters": null
+    },
+    "userName": "rohithr",
+    "subscription": null,
+    "userEmail": "cipher.ninja123@gmail.com",
+    "serviceProviderAwsRegion": "ap-south-1",
+    "serviceProviderAwsCredentials": "<REDACTED>",
+    "serviceProviderAwsAccountId": "442042539628",
+    "projectType": "traditional",
+    "versionSf": "4.4.7",
+    "serviceProviderAwsCfStackName": "service-api-dev",
+    "integrations": {},
+    "serviceUniqueId": "arn:aws:cloudformation:ap-south-1:442042539628:stack/service-api-dev/53326fd0-9081-11ef-8070-023f5625b62f",
+    "serviceProviderAwsCfStackId": "arn:aws:cloudformation:ap-south-1:442042539628:stack/service-api-dev/53326fd0-9081-11ef-8070-023f5625b62f",
+    "serviceProviderAwsCfStackCreated": "2024-10-22T14:24:19.931Z",
+    "serviceProviderAwsCfStackUpdated": "2024-10-22T15:55:28.325Z",
+    "serviceProviderAwsCfStackStatus": "UPDATE_COMPLETE",
+    "serviceProviderAwsCfStackOutputs": [
+      {
+        "OutputKey": "HiFunctionLambdaFunctionQualifiedArn",
+        "OutputValue": "arn:aws:lambda:ap-south-1:442042539628:function:service-api-dev-hiFunction:1",
+        "Description": "Current Lambda function version",
+        "ExportName": "sls-service-api-dev-HiFunctionLambdaFunctionQualifiedArn"
+      },
+      {
+        "OutputKey": "ByeFunctionLambdaFunctionQualifiedArn",
+        "OutputValue": "arn:aws:lambda:ap-south-1:442042539628:function:service-api-dev-byeFunction:1",
+        "Description": "Current Lambda function version",
+        "ExportName": "sls-service-api-dev-ByeFunctionLambdaFunctionQualifiedArn"
+      },
+      {
+        "OutputKey": "HttpApiId",
+        "OutputValue": "tubenkuno1",
+        "Description": "Id of the HTTP API",
+        "ExportName": "sls-service-api-dev-HttpApiId"
+      },
+      {
+        "OutputKey": "ServerlessDeploymentBucketName",
+        "OutputValue": "serverless-framework-deployments-ap-south-1-574a5a19-d119",
+        "ExportName": "sls-service-api-dev-ServerlessDeploymentBucketName"
+      },
+      {
+        "OutputKey": "HttpApiUrl",
+        "OutputValue": "https://tubenkuno1.execute-api.ap-south-1.amazonaws.com",
+        "Description": "URL of the HTTP API",
+        "ExportName": "sls-service-api-dev-HttpApiUrl"
+      }
+    ]
+  }
+}

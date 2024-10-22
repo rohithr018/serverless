@@ -1,0 +1,26 @@
+service: service-api
+
+provider:
+  name: aws
+  runtime: nodejs18.x
+  region: ap-south-1
+
+functions:
+  hiFunction:
+    handler: hello.handler
+    events:
+      - httpApi: 
+          path: /hello
+          method: GET
+  byeFunction:
+    handler: gm.handler
+    events:
+      - httpApi: 
+          path: /gm
+          method: GET
+
+
+
+
+          
+          
